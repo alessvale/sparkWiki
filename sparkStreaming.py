@@ -37,9 +37,14 @@ if __name__ == "__main__":
 
     data.printSchema()
 
-    
+    # Query the streaming with a 10 second window slide with 20 seconds timestamp delay
 
-    activityCount = data.withWatermark("Timestamp", "20 seconds").groupBy("Bot", window(col("Timestamp"), "10 seconds")).count().where("Bot = 'False'").limit(1)
+    activityCount = data.withWatermark("Timestamp", "20 seconds") \
+                        .dropDuplicates(["User", "Timestamp"]) \
+                        .groupBy("Bot", window(col("Timestamp"), "10 seconds")) \
+                        .count() \
+                        .where("Bot = 'True'") \
+                        .limit(1)
 
     spark.conf.set("spark.sql.shuffle.partitions", 5)
 
@@ -51,6 +56,8 @@ if __name__ == "__main__":
              .outputMode('complete') \
              .start()
              
+
+    # Query the stream and output to console
 
     while 1:
 
