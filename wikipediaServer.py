@@ -26,33 +26,39 @@ def publish_message(producer_instance, topic_name, key, value):
         print('Exception in publishing message')
         print(str(ex))
 
-producer = connect_kafka_producer()
-topic = "Wikipedia"
+if __name__ == "__main__":
 
-url = 'https://stream.wikimedia.org/v2/stream/recentchange'
-count = 0
+    ## Instantiate a producer
+    producer = connect_kafka_producer()
 
-for event in EventSource(url):
-                count += 1
-                if event.event == 'message':
-                    try:
+    ## Give a topic
+    topic = "Wikipedia"
 
-                        change = json.loads(event.data)
-                        user = change["user"]
-                        title = change["title"]
-                        bot = change["bot"]
-                        timestamp = change["meta"]["dt"]
+    ## Streaming Url
+    url = 'https://stream.wikimedia.org/v2/stream/recentchange'
 
-                    except ValueError:
-
-                        pass
+    ## Read the stream and produce messages to Kafka
+    for event in EventSource(url):
                     
-                    else:
-                        
-                        str_send = 'User ' + user + ',' + 'Title ' + title + ',' + 'Bot ' + str(bot) + ',' + 'Timestamp ' + str(timestamp) + '\n'
+                    if event.event == 'message':
+                        try:
 
-                        if count%10 == 0:
+                            change = json.loads(event.data)
+                            user = change["user"]
+                            title = change["title"]
+                            bot = change["bot"]
+                            timestamp = change["meta"]["dt"]
+
+                        except ValueError:
+
+                            pass
+                        
+                        else:
+                            
+                            str_send = 'User ' + user + ',' + 'Title ' + title + ',' + 'Bot ' + str(bot) + ',' + 'Timestamp ' + str(timestamp) + '\n'
+                            
                             print(str_send)
                             ## Produce message to Kafka
+
                             publish_message(producer, topic, 'parsed', str_send)
-                            count = 0
+                       

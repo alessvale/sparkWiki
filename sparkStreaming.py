@@ -37,11 +37,13 @@ if __name__ == "__main__":
 
     data.printSchema()
 
-    ## Use console as a sink where("LOWER(Bot) LIKE 'true'")
+    
 
-    activityCount = data.groupBy("Bot").count()
+    activityCount = data.withWatermark("Timestamp", "20 seconds").groupBy("Bot", window(col("Timestamp"), "10 seconds")).count().where("Bot = 'False'").limit(1)
 
     spark.conf.set("spark.sql.shuffle.partitions", 5)
+
+    # Use memory as a sink for the SQL query below
 
     query = activityCount.writeStream \
              .queryName("Counting") \
@@ -50,11 +52,11 @@ if __name__ == "__main__":
              .start()
              
 
-    for i in range(0, 40):
+    while 1:
 
-        spark.sql("SELECT * FROM Counting").show()
-        sleep(5)
+        spark.sql("SELECT * FROM Counting").show(5, False)
+        sleep(10)
     
-    ##query.awaitTermination()
+    query.awaitTermination()
 
 
