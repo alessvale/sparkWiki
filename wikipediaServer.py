@@ -57,7 +57,6 @@ if __name__ == "__main__":
                             
                             str_send = 'User ' + user + ',' + 'Title ' + title + ',' + 'Bot ' + str(bot) + ',' + 'Timestamp ' + str(timestamp) + '\n'
                             
-                            print(str_send)
                             ## Produce message to Kafka
 
                             publish_message(producer, topic, 'parsed', str_send)

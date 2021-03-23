@@ -46,6 +46,8 @@ if __name__ == "__main__":
                         .where("Bot = 'True'") \
                         .limit(1)
 
+    # Manage the partitions on the local machine
+
     spark.conf.set("spark.sql.shuffle.partitions", 5)
 
     # Use memory as a sink for the SQL query below
@@ -59,7 +61,7 @@ if __name__ == "__main__":
 
     # Query the stream and output to console
 
-    while 1:
+    while True:
 
         spark.sql("SELECT * FROM Counting").show(5, False)
         sleep(10)
