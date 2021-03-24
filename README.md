@@ -5,4 +5,5 @@ Dependencies:
 <ul>
   <li> PySpark 3.1.1 </li>
   <li> Kafka-python 2.0.2 </li>
+  <li> SSEClient </li>
   </ul>
